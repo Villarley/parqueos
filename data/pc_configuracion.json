@@ -1,1 +1,8 @@
-{ "horario_inicio": "07:00", "horario_fin": "22:00", "tarifa_hora": 1.5, "tiempo_minimo": 15, "multa_por_hora": 5 }
+{
+    "horario_inicio": "07:00",
+    "horario_fin": "22:00",
+    "tarifa": 150,
+    "tiempo_minimo": 30,
+    "multa_por_hora": 5000
+}
+  

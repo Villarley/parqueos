@@ -1,1 +1,11 @@
-[]
+[
+    {
+        "id": "016ca68c-1e14-4888-81e1-c2fa550a60b5",
+        "espacio_id": "ESP001",
+        "usuario": "santivillarley1010@gmail.com",
+        "inicio": "29/05/2025 23:45",
+        "fin": "30/05/2025 01:24",
+        "estado": "activo",
+        "costo_total": 247.5
+    }
+]

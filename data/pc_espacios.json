@@ -1,1 +1,17 @@
-[]
+[
+    {
+        "id": "ESP001",
+        "ubicacion": "Calle 1, Sector A",
+        "estado": "ocupado"
+    },
+    {
+        "id": "ESP002",
+        "ubicacion": "Calle 2, Sector B",
+        "estado": "ocupado"
+    },
+    {
+        "id": "ESP003",
+        "ubicacion": "Calle 3, Sector C",
+        "estado": "libre"
+    }
+]

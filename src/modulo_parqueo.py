@@ -95,3 +95,9 @@ def liberar_espacio(id_alquiler: str) -> bool:
     mu.escribir_json(ALQUILERES_PATH, alquileres)
     mu.escribir_json(ESPACIOS_PATH, espacios)
     return True
+# ----------------------------
+# Obtener alquiler activo por usuario
+# ----------------------------
+def obtener_alquiler_activo(correo_usuario: str) -> dict | None:
+    alquileres = mu.leer_json(ALQUILERES_PATH)
+    return next((a for a in alquileres if a["usuario"] == correo_usuario and a["estado"] == "activo"), None)
