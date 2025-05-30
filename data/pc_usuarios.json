@@ -1,1 +1,18 @@
-[]
+[
+    {
+        "correo": "juan@example.com",
+        "contrasena": "$2b$12$...",
+        "nombre": "Juan Pérez",
+        "telefono": "0998765432",
+        "placa": "ABC123",
+        "rol": "usuario"
+    },
+    {
+        "correo": "santivillarley1010@gmail.com",
+        "contrasena": "$2b$12$VJAUXg.z.iiQFXfZZwfI5u5hf6.kwCJRHUgbISWQX7r2ffFD6vbhe",
+        "nombre": "Santiago",
+        "telefono": "+50686776886",
+        "placa": "GT3911",
+        "rol": "usuario"
+    }
+]

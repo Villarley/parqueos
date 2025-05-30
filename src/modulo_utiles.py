@@ -113,8 +113,8 @@ def enviar_correo(destino: str, asunto: str, cuerpo: str) -> None:
         asunto (str): Asunto del correo.
         cuerpo (str): Contenido del mensaje.
     """
-    remitente = 'tucorreo@gmail.com'
-    clave = 'tu_clave_app'  # Usa clave de aplicación para Gmail
+    remitente = 'santivillarley1010@gmail.com'
+    clave = 'vhev updw cwgj dvkv'  # Usa clave de aplicación para Gmail
 
     mensaje = MIMEMultipart()
     mensaje['From'] = remitente

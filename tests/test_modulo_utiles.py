@@ -3,10 +3,9 @@
 import sys
 import os
 
-# Agrega la carpeta src al path de imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import modulo_utiles as mu
+from src import modulo_utiles as mu
 
 def test_validar_correo():
     assert mu.validar_correo("correo@ejemplo.com") is True
