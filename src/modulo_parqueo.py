@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 import uuid
-from src import modulo_utiles as mu
+import modulo_utiles as mu
 
 ESPACIOS_PATH = "data/pc_espacios.json"
 ALQUILERES_PATH = "data/pc_alquileres.json"
