@@ -25,6 +25,22 @@ def registrar_usuario_completo(datos):
     mu.escribir_json(USUARIOS_PATH, usuarios)
     return True
 
+def validar_contrasena(contrasena: str) -> bool:
+    """
+    Valida si la contraseña es segura:
+    - Al menos 8 caracteres
+    - Contiene una mayúscula
+    - Contiene un número
+
+    Returns:
+        bool: True si cumple con los criterios, False si no.
+    """
+    return (
+        len(contrasena) >= 8 and
+        any(c.isupper() for c in contrasena) and
+        any(c.isdigit() for c in contrasena)
+    )
+
 # ---------------------------
 # Autenticación
 # ---------------------------
@@ -35,6 +51,7 @@ def autenticar_usuario(identificacion, contrasena: str) -> dict | None:
     if usuario and bcrypt.checkpw(contrasena.encode('utf-8'), usuario["contrasena"].encode('utf-8')):
         return usuario
     return None
+
 
 # ---------------------------
 # Actualizar usuario
@@ -95,4 +112,37 @@ Este sistema no permite ver tu contraseña por seguridad.
 Contacta al administrador para reiniciarla."""
         mu.enviar_correo(correo, "Recuperación de contraseña", mensaje)
         return True
+    return False
+# ---------------------------
+# Cambiar contraseña
+# ---------------------------
+def actualizar_contrasena(identificacion, nueva):
+    usuarios = mu.leer_json(USUARIOS_PATH)
+    for u in usuarios:
+        if u["identificacion"] == identificacion:
+            u["contrasena"] = bcrypt.hashpw(nueva.encode(), bcrypt.gensalt()).decode()
+            # 👇 aquí agregas esto
+            u.pop("temporal", None)
+            mu.escribir_json(USUARIOS_PATH, usuarios)
+            return True
+    return False
+
+# ---------------------------
+# Establecer contraseña temporal
+# ---------------------------
+def establecer_clave_temporal(correo, nueva_temporal):
+    usuarios = mu.leer_json(USUARIOS_PATH)
+    for u in usuarios:
+        if u["correo"] == correo:
+            u["contrasena"] = bcrypt.hashpw(nueva_temporal.encode(), bcrypt.gensalt()).decode()
+            u["temporal"] = True  # flag para forzar cambio
+            mu.escribir_json(USUARIOS_PATH, usuarios)
+
+            cuerpo = (
+                f"Hola {u['nombre']},\n\n"
+                f"Tu nueva contraseña temporal es: {nueva_temporal}\n"
+                "Esta contraseña es de un solo uso. Debes iniciar sesión y cambiarla inmediatamente."
+            )
+            mu.enviar_correo(u["correo"], "Contraseña temporal", cuerpo)
+            return True
     return False

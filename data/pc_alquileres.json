@@ -41,7 +41,7 @@
         "usuario": "santivillarley1010@gmail.com",
         "inicio": "30/05/2025 20:02",
         "fin": "30/05/2025 20:32",
-        "estado": "activo",
+        "estado": "finalizado",
         "costo_total": 75.0
     },
     {
@@ -50,7 +50,17 @@
         "usuario": "santivillarley1010@gmail.com",
         "inicio": "30/05/2025 21:45",
         "fin": "30/05/2025 22:45",
-        "estado": "activo",
+        "estado": "finalizado",
         "costo_total": 150.0
+    },
+    {
+        "id": "14f8f7e3-b284-445c-aa2b-83fadbca5451",
+        "espacio_id": "ESP001",
+        "usuario": "santivillarley1010@gmail.com",
+        "inicio": "30/05/2025 22:54",
+        "fin": "30/05/2025 23:54",
+        "estado": "activo",
+        "costo_total": 150.0,
+        "placa": "GT3RSS"
     }
 ]

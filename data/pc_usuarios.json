@@ -1,7 +1,7 @@
 [
     {
         "identificacion": "119780888",
-        "contrasena": "$2b$12$/KAMRXHDHrhMYJBpExsFbOayAvwEvIE/zH6qSRshfZ.vKblAHfJna",
+        "contrasena": "$2b$12$w4bhsLqm22VpyZG.tpNF1.hF4jLwWtIOU9ynuZzJTADOkwcBM5VEu",
         "nombre": "Santiago",
         "apellidos": "Villarreal",
         "telefono": "86776886",
@@ -12,7 +12,13 @@
             "vencimiento": "01/28",
             "cvv": "222"
         },
-        "vehiculos": [],
+        "vehiculos": [
+            {
+                "placa": "GT3RSS",
+                "marca": "",
+                "modelo": ""
+            }
+        ],
         "fecha_registro": "30/05/2025 20:23",
         "rol": "usuario"
     }

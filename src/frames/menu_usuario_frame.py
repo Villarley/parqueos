@@ -7,7 +7,7 @@ from frames.desaparcar_frame import DesaparcarFrame
 from frames.agregar_tiempo_frame import AgregarTiempoFrame
 from frames.reportes_frame import ReportesFrame  # ← NUEVO
 import modulo_utiles as mu
-
+from frames.user.perfil_usuario_frame import PerfilUsuarioFrame
 class MenuUsuarioFrame(BaseFrame):
     def __init__(self, master, usuario):
         mu.actualizar_estados_de_parqueo()
@@ -27,6 +27,9 @@ class MenuUsuarioFrame(BaseFrame):
                   command=lambda: self.master.cambiar_frame(AgregarTiempoFrame, self.usuario)).pack(pady=5)
 
         tk.Button(self, text="📊 Reportes", 
-                  command=lambda: self.master.cambiar_frame(ReportesFrame, self.usuario)).pack(pady=5)  # ← NUEVO
+                  command=lambda: self.master.cambiar_frame(ReportesFrame, self.usuario)).pack(pady=5)
+
+        tk.Button(self, text="👤 Perfil", 
+                  command=lambda: self.master.cambiar_frame(PerfilUsuarioFrame, self.usuario)).pack(pady=5)
 
         self.crear_boton_volver()

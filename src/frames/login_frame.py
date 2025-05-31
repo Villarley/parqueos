@@ -1,4 +1,7 @@
 import tkinter as tk
+from tkinter import simpledialog
+import string
+import random
 from tkinter import messagebox
 import modulo_usuarios as mu
 from frames.base_frame import BaseFrame
@@ -28,16 +31,28 @@ class LoginFrame(BaseFrame):
 
         usuario = mu.autenticar_usuario(identificacion, contrasena)
         if usuario:
+            if usuario.get("temporal"):  # Tiene contraseña temporal
+                messagebox.showinfo("Contraseña temporal", "Debes cambiar tu contraseña ahora.")
+                from frames.auth.cambiar_contrasenia_frame import CambiarContrasenaFrame
+                self.master.cambiar_frame(CambiarContrasenaFrame, usuario)
+                return
+
             messagebox.showinfo("Bienvenido", f"Hola {usuario['nombre']}")
             from frames.menu_usuario_frame import MenuUsuarioFrame
             self.master.cambiar_frame(MenuUsuarioFrame, usuario)
         else:
             messagebox.showerror("Error", "Credenciales incorrectas")
 
+
     def recuperar(self):
-        # Se mantiene recuperación por correo
-        correo = tk.simpledialog.askstring("Recuperar contraseña", "Ingresa tu correo registrado")
-        if correo and mu.enviar_recordatorio_contrasena(correo):
-            messagebox.showinfo("Enviado", "Correo enviado correctamente")
+        correo = simpledialog.askstring("Recuperar contraseña", "Ingresa tu correo registrado")
+        if not correo:
+            return
+
+        clave_temporal = ''.join(random.choices(string.ascii_letters + string.digits + "!@#$%", k=10))
+        exito = mu.establecer_clave_temporal(correo, clave_temporal)
+
+        if exito:
+            messagebox.showinfo("Enviado", "Se ha enviado una contraseña temporal a tu correo.")
         else:
-            messagebox.showerror("Error", "Correo no encontrado o inválido")
+            messagebox.showerror("Error", "Correo no encontrado o inválido.")

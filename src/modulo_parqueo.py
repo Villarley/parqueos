@@ -18,21 +18,21 @@ def obtener_espacios_disponibles() -> list:
 # ----------------------------
 # Alquilar espacio
 # ----------------------------
-def alquilar_espacio(correo_usuario: str, id_espacio: str, minutos: int) -> bool:
+def alquilar_espacio(correo_usuario: str, id_espacio: str, minutos: int, placa: str) -> bool:
     espacios = mu.leer_json(ESPACIOS_PATH)
     alquileres = mu.leer_json(ALQUILERES_PATH)
     config = mu.leer_json(CONFIG_PATH)
 
     espacio = next((e for e in espacios if e["id"] == id_espacio), None)
-    if not espacio or espacio["estado"] != "libre":
+    if not espacio:
         return False
 
-    # Mínimo de tiempo
     if minutos < config["tiempo_minimo"]:
         return False
 
     inicio = datetime.now()
     fin = inicio + timedelta(minutes=minutos)
+    costo = round((minutos / 60) * config["tarifa"], 2)
 
     nuevo = {
         "id": str(uuid.uuid4()),
@@ -41,18 +41,30 @@ def alquilar_espacio(correo_usuario: str, id_espacio: str, minutos: int) -> bool
         "inicio": inicio.strftime("%d/%m/%Y %H:%M"),
         "fin": fin.strftime("%d/%m/%Y %H:%M"),
         "estado": "activo",
-        "costo_total": round((minutos / 60) * config["tarifa"], 2)
+        "costo_total": costo,
+        "placa": placa
     }
 
     alquileres.append(nuevo)
-
-    # Marcar espacio como ocupado
     espacio["estado"] = "ocupado"
 
     mu.escribir_json(ALQUILERES_PATH, alquileres)
     mu.escribir_json(ESPACIOS_PATH, espacios)
 
+    # Enviar correo de confirmación
+    cuerpo = (
+        f"Hola,\n\nHas alquilado el espacio {id_espacio}.\n"
+        f"Placa: {placa}\n"
+        f"Inicio: {nuevo['inicio']}\n"
+        f"Fin: {nuevo['fin']}\n"
+        f"Duración: {minutos} minutos\n"
+        f"Costo total: ₡{costo}\n\n"
+        f"Gracias por usar el sistema de parqueos."
+    )
+    mu.enviar_correo(destino=correo_usuario, asunto="Confirmación de alquiler", cuerpo=cuerpo)
+
     return True
+
 
 # ----------------------------
 # Agregar tiempo
@@ -101,3 +113,15 @@ def liberar_espacio(id_alquiler: str) -> bool:
 def obtener_alquiler_activo(correo_usuario: str) -> dict | None:
     alquileres = mu.leer_json(ALQUILERES_PATH)
     return next((a for a in alquileres if a["usuario"] == correo_usuario and a["estado"] == "activo"), None)
+def verificar_estado_espacio(id_espacio: str) -> str:
+    """
+    Devuelve el estado actual del espacio:
+    - 'libre'
+    - 'ocupado'
+    - 'no_existe'
+    """
+    espacios = mu.leer_json(ESPACIOS_PATH)
+    espacio = next((e for e in espacios if e["id"] == id_espacio), None)
+    if not espacio:
+        return "no_existe"
+    return espacio["estado"]

@@ -12,6 +12,6 @@
     {
         "id": "ESP003",
         "ubicacion": "Calle 3, Sector C",
-        "estado": "ocupado"
+        "estado": "libre"
     }
 ]
