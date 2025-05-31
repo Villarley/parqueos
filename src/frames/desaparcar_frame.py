@@ -11,20 +11,26 @@ class DesaparcarFrame(BaseFrame):
         self.crear_widgets()
 
     def crear_widgets(self):
-        tk.Label(self, text="¿Deseas desaparcar tu vehículo?").pack(pady=10)
+        tk.Label(self, text="🚗 Desaparcar").pack(pady=10)
 
-        espacio = mp.obtener_espacio_actual(self.usuario["correo"])
-        if not espacio:
-            tk.Label(self, text="⚠️ No tienes un espacio alquilado actualmente").pack()
-        else:
-            tk.Label(self, text=f"Espacio actual: {espacio['id']}").pack()
+        self.alquiler = mp.obtener_alquiler_activo(self.usuario["correo"])
+        if not self.alquiler:
+            tk.Label(self, text="⚠️ No tienes un espacio alquilado").pack()
+            self.crear_boton_volver()
+            return
 
-        tk.Button(self, text="🚗 Desaparcar", command=self.desaparcar).pack(pady=10)
+        tk.Label(self, text=f"Espacio ID: {self.alquiler['espacio_id']}").pack()
+        tk.Label(self, text=f"Inicio: {self.alquiler['inicio']}").pack()
+        tk.Label(self, text=f"Fin programado: {self.alquiler['fin']}").pack()
+
+        tk.Button(self, text="🛑 Finalizar alquiler", command=self.confirmar_liberacion).pack(pady=10)
         self.crear_boton_volver()
 
-    def desaparcar(self):
-        if mp.desaparcar(self.usuario["correo"]):
-            messagebox.showinfo("Éxito", "Vehículo desaparcardo correctamente")
-            self.volver_al_menu()
-        else:
-            messagebox.showerror("Error", "No se pudo desaparcar. ¿Ya habías liberado el espacio?")
+    def confirmar_liberacion(self):
+        confirm = messagebox.askyesno("Confirmar", "¿Seguro que deseas finalizar el alquiler?")
+        if confirm:
+            if mp.liberar_espacio(self.alquiler["id"]):
+                messagebox.showinfo("Listo", "Espacio liberado exitosamente.")
+                self.volver_al_menu()
+            else:
+                messagebox.showerror("Error", "No se pudo liberar el espacio.")

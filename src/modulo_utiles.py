@@ -6,6 +6,8 @@ import smtplib
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+import os
 
 # ---------------------
 # Manejo de Archivos JSON
@@ -84,7 +86,7 @@ def validar_telefono(tel: str) -> bool:
     Returns:
         bool: True si es válido, False en caso contrario.
     """
-    return re.fullmatch(r'\d{10}', tel) is not None
+    return re.fullmatch(r'\d{8}', tel) is not None
 
 # ---------------------
 # Fecha y Hora Actual
@@ -104,7 +106,7 @@ def fecha_hora_actual() -> str:
 # Envío de Correos
 # ---------------------
 
-def enviar_correo(destino: str, asunto: str, cuerpo: str) -> None:
+def enviar_correo(destino: str, asunto: str, cuerpo: str, adjunto: str = None) -> bool:
     """
     Envía un correo electrónico usando SMTP.
 
@@ -112,22 +114,104 @@ def enviar_correo(destino: str, asunto: str, cuerpo: str) -> None:
         destino (str): Dirección del destinatario.
         asunto (str): Asunto del correo.
         cuerpo (str): Contenido del mensaje.
+        adjunto (str, optional): Ruta al archivo adjunto. Defaults to None.
+
+    Returns:
+        bool: True si el correo se envió correctamente, False en caso contrario.
     """
     remitente = 'santivillarley1010@gmail.com'
     clave = 'vhev updw cwgj dvkv'  # Usa clave de aplicación para Gmail
 
-    mensaje = MIMEMultipart()
-    mensaje['From'] = remitente
-    mensaje['To'] = destino
-    mensaje['Subject'] = asunto
-    mensaje.attach(MIMEText(cuerpo, 'plain'))
+    msg = MIMEMultipart()
+    msg['From'] = remitente
+    msg['To'] = destino
+    msg['Subject'] = asunto
+
+    msg.attach(MIMEText(cuerpo, 'plain'))
+
+    if adjunto:
+        with open(adjunto, "rb") as f:
+            part = MIMEApplication(f.read(), Name=os.path.basename(adjunto))
+            part['Content-Disposition'] = f'attachment; filename="{os.path.basename(adjunto)}"'
+            msg.attach(part)
 
     try:
         servidor = smtplib.SMTP('smtp.gmail.com', 587)
         servidor.starttls()
         servidor.login(remitente, clave)
-        servidor.send_message(mensaje)
+        servidor.send_message(msg)
         servidor.quit()
-        print("Correo enviado correctamente.")
+        return True
     except Exception as e:
         print(f"Error al enviar correo: {e}")
+        return False
+    
+# ---------------------
+# Envío de Correos (versión con adjunto binario y nombre)
+# ---------------------
+
+def enviar_correo_con_adjunto_binario(destino: str, asunto: str, cuerpo: str, adjunto: bytes, nombre_adjunto: str) -> bool:
+    remitente = 'santivillarley1010@gmail.com'
+    clave = 'vhev updw cwgj dvkv'  # clave de aplicación
+
+    msg = MIMEMultipart()
+    msg['From'] = remitente
+    msg['To'] = destino
+    msg['Subject'] = asunto
+
+    msg.attach(MIMEText(cuerpo, 'plain'))
+
+    if adjunto:
+        parte_adjunto = MIMEApplication(adjunto, Name=nombre_adjunto)
+        parte_adjunto['Content-Disposition'] = f'attachment; filename="{nombre_adjunto}"'
+        msg.attach(parte_adjunto)
+
+    try:
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(remitente, clave)
+        servidor.send_message(msg)
+        servidor.quit()
+        return True
+    except Exception as e:
+        print(f"Error al enviar correo con adjunto binario: {e}")
+        return False
+# ---------------------
+# Actualización automática de espacios vencidos
+# ---------------------
+
+ESPACIOS_PATH = "data/pc_espacios.json"
+ALQUILERES_PATH = "data/pc_alquileres.json"
+
+def actualizar_estados_de_parqueo():
+    """
+    Libera automáticamente espacios vencidos y actualiza alquileres de 'activo' a 'finalizado'.
+    """
+    espacios = leer_json(ESPACIOS_PATH)
+    alquileres = leer_json(ALQUILERES_PATH)
+    ahora = datetime.now()
+
+    cambios = False
+
+    for esp in espacios:
+        espacio_id = esp["id"]
+
+        # Buscar alquiler ACTIVO más reciente para este espacio
+        alquiler = next(
+            (a for a in sorted(alquileres, key=lambda x: x["fin"], reverse=True)
+             if a["espacio_id"] == espacio_id and a["estado"] == "activo"),
+            None
+        )
+
+        if alquiler:
+            fin_dt = datetime.strptime(alquiler["fin"], "%d/%m/%Y %H:%M")
+            if ahora > fin_dt:
+                # Cambiar estado del alquiler
+                alquiler["estado"] = "finalizado"
+                # Liberar el espacio
+                esp["estado"] = "libre"
+                cambios = True
+
+    if cambios:
+        escribir_json(ESPACIOS_PATH, espacios)
+        escribir_json(ALQUILERES_PATH, alquileres)

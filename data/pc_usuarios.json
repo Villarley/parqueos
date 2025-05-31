@@ -1,18 +1,19 @@
 [
     {
-        "correo": "juan@example.com",
-        "contrasena": "$2b$12$...",
-        "nombre": "Juan Pérez",
-        "telefono": "0998765432",
-        "placa": "ABC123",
-        "rol": "usuario"
-    },
-    {
-        "correo": "santivillarley1010@gmail.com",
-        "contrasena": "$2b$12$VJAUXg.z.iiQFXfZZwfI5u5hf6.kwCJRHUgbISWQX7r2ffFD6vbhe",
+        "identificacion": "119780888",
+        "contrasena": "$2b$12$/KAMRXHDHrhMYJBpExsFbOayAvwEvIE/zH6qSRshfZ.vKblAHfJna",
         "nombre": "Santiago",
-        "telefono": "+50686776886",
-        "placa": "GT3911",
+        "apellidos": "Villarreal",
+        "telefono": "86776886",
+        "correo": "santivillarley1010@gmail.com",
+        "direccion": "Santa Ana",
+        "tarjeta": {
+            "numero": "1111111111111111",
+            "vencimiento": "01/28",
+            "cvv": "222"
+        },
+        "vehiculos": [],
+        "fecha_registro": "30/05/2025 20:23",
         "rol": "usuario"
     }
 ]
