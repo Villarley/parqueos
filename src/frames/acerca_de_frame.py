@@ -2,7 +2,7 @@ import tkinter as tk
 from frames.base_frame import BaseFrame
 
 class AcercaDeFrame(BaseFrame):
-    def __init__(self, master):
+    def __init__(self, master, usuario):
         super().__init__(master)
         self.crear_widgets()
 

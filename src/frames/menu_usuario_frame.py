@@ -14,9 +14,10 @@ from frames.reportes_frame import ReportesFrame
 from frames.acerca_de_frame import AcercaDeFrame
 from frames.user.perfil_usuario_frame import PerfilUsuarioFrame
 import modulo_utiles as mu
-
+import modulo_parqueo as mp
 class MenuUsuarioFrame(BaseFrame):
     def __init__(self, master, usuario):
+        mp.verificar_multas()
         mu.actualizar_estados_de_parqueo()
         super().__init__(master, usuario)
         self.crear_widgets()

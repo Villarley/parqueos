@@ -84,7 +84,20 @@ def agregar_tiempo_alquiler(id_alquiler: str, minutos_extra: int) -> bool:
     alquiler["costo_total"] += round((minutos_extra / 60) * config["tarifa"], 2)
 
     mu.escribir_json(ALQUILERES_PATH, alquileres)
+
+    # Enviar correo confirmando la extensión
+    mu.enviar_correo(
+        destino=alquiler["usuario"],
+        asunto="Tiempo de parqueo extendido",
+        cuerpo=(
+            f"Se agregó {minutos_extra} minutos al alquiler en el espacio {alquiler['espacio_id']}.\n"
+            f"Nuevo tiempo final: {alquiler['fin']}\n"
+            f"Nuevo costo total: ₡{alquiler['costo_total']}"
+        )
+    )
+
     return True
+
 
 # ----------------------------
 # Desaparcar (liberar)
@@ -125,3 +138,45 @@ def verificar_estado_espacio(id_espacio: str) -> str:
     if not espacio:
         return "no_existe"
     return espacio["estado"]
+# ----------------------------
+# Verificar multas por tiempo excedido
+# ----------------------------
+def verificar_multas():
+    alquileres = mu.leer_json(ALQUILERES_PATH)
+    espacios = mu.leer_json(ESPACIOS_PATH)
+    multas = mu.leer_json("data/pc_multas.json")
+
+    ahora = datetime.now()
+    cambios = False
+
+    for alquiler in alquileres:
+        if alquiler["estado"] == "activo":
+            fin = datetime.strptime(alquiler["fin"], "%d/%m/%Y %H:%M")
+            if ahora > fin:
+                alquiler["estado"] = "finalizado"
+
+                espacio = next((e for e in espacios if e["id"] == alquiler["espacio_id"]), None)
+                if espacio:
+                    espacio["estado"] = "libre"
+
+                multa = {
+                    "correo": alquiler["usuario"],
+                    "espacio": alquiler["espacio_id"],
+                    "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+                    "placa": alquiler.get("placa", "N/D"),  # Si decides registrar placas
+                    "detalle": "Tiempo de parqueo excedido sin desaparcar"
+                }
+                multas.append(multa)
+                cambios = True
+
+                # Enviar correo al usuario
+                mu.enviar_correo(
+                    destino=alquiler["usuario"],
+                    asunto="Multa por exceder tiempo",
+                    cuerpo=f"Se registró una multa por no desaparcar a tiempo en el espacio {alquiler['espacio_id']}."
+                )
+
+    if cambios:
+        mu.escribir_json(ALQUILERES_PATH, alquileres)
+        mu.escribir_json(ESPACIOS_PATH, espacios)
+        mu.escribir_json("data/pc_multas.json", multas)

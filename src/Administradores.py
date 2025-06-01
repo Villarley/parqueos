@@ -1,17 +1,17 @@
 # src/Administradores.py
 
 import tkinter as tk
-from frames.login_frame import LoginFrame
+from frames.administradores.menu_frame import MenuFrame
 
-class App(tk.Tk):
+class AppAdmin(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Parqueo Callejero - Usuario")
+        self.title("Parqueo Callejero - Administración")
         self.geometry("500x500")
         self.resizable(True, True)
 
         self.current_frame = None
-        self.cambiar_frame(LoginFrame)
+        self.cambiar_frame(MenuFrame)
 
     def cambiar_frame(self, frame_class, *args):
         if self.current_frame:
@@ -21,5 +21,5 @@ class App(tk.Tk):
         self.current_frame.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
-    app = App()
+    app = AppAdmin()
     app.mainloop()

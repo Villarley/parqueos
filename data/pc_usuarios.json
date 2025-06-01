@@ -3,7 +3,7 @@
         "identificacion": "119780888",
         "contrasena": "$2b$12$w4bhsLqm22VpyZG.tpNF1.hF4jLwWtIOU9ynuZzJTADOkwcBM5VEu",
         "nombre": "Santiago",
-        "apellidos": "Villarreal",
+        "apellidos": "Villarreal Arley",
         "telefono": "86776886",
         "correo": "santivillarley1010@gmail.com",
         "direccion": "Santa Ana",
@@ -15,6 +15,11 @@
         "vehiculos": [
             {
                 "placa": "GT3RSS",
+                "marca": "",
+                "modelo": ""
+            },
+            {
+                "placa": "WGMI23",
                 "marca": "",
                 "modelo": ""
             }
