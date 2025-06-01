@@ -1,15 +1,15 @@
 [
     {
         "identificacion": "119780888",
-        "contrasena": "$2b$12$w4bhsLqm22VpyZG.tpNF1.hF4jLwWtIOU9ynuZzJTADOkwcBM5VEu",
+        "contrasena": "$2b$12$uIVk5KTften1hzeUMD/5fuBy5aZ4N7ifxt6CnFd6pQgtuBKLnomty",
         "nombre": "Santiago",
         "apellidos": "Villarreal Arley",
         "telefono": "86776886",
         "correo": "santivillarley1010@gmail.com",
-        "direccion": "Santa Ana",
+        "direccion": "Sta ana",
         "tarjeta": {
             "numero": "1111111111111111",
-            "vencimiento": "01/28",
+            "vencimiento": "01/29",
             "cvv": "222"
         },
         "vehiculos": [
@@ -17,14 +17,9 @@
                 "placa": "GT3RSS",
                 "marca": "",
                 "modelo": ""
-            },
-            {
-                "placa": "WGMI23",
-                "marca": "",
-                "modelo": ""
             }
         ],
-        "fecha_registro": "30/05/2025 20:23",
+        "fecha_registro": "01/06/2025 12:21",
         "rol": "usuario"
     }
 ]

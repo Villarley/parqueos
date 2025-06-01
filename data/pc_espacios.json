@@ -1,17 +1,42 @@
-[
-    {
-        "id": "ESP001",
-        "ubicacion": "Calle 1, Sector A",
-        "estado": "ocupado"
+{
+    "1": {
+        "habilitado": "N",
+        "usuario": "",
+        "placa": "",
+        "inicio": "",
+        "tiempo": 0,
+        "fin": ""
     },
-    {
-        "id": "ESP002",
-        "ubicacion": "Calle 2, Sector B",
-        "estado": "ocupado"
+    "2": {
+        "habilitado": "S",
+        "usuario": "",
+        "placa": "",
+        "inicio": "",
+        "tiempo": 0,
+        "fin": ""
     },
-    {
-        "id": "ESP003",
-        "ubicacion": "Calle 3, Sector C",
-        "estado": "libre"
+    "3": {
+        "habilitado": "S",
+        "usuario": "santivillarley1010@gmail.com",
+        "placa": "GT3RSS",
+        "inicio": "01/06/2025 15:40",
+        "tiempo": 4,
+        "fin": "01/06/2025 15:44"
+    },
+    "6": {
+        "habilitado": "S",
+        "usuario": "santivillarley1010@gmail.com",
+        "placa": "GT3RSS",
+        "inicio": "01/06/2025 15:35",
+        "tiempo": 30,
+        "fin": "01/06/2025 16:05"
+    },
+    "7": {
+        "habilitado": "S",
+        "usuario": "",
+        "placa": "",
+        "inicio": "",
+        "tiempo": 0,
+        "fin": ""
     }
-]
+}

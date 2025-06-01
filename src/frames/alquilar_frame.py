@@ -10,7 +10,7 @@ class AlquilarFrame(BaseFrame):
         self.usuario = usuario
         self.placa_var = tk.StringVar()
         self.espacio_var = tk.StringVar()
-        self.duracion_var = tk.IntVar(value=30)
+        self.duracion_var = tk.StringVar()
         self.crear_widgets()
 
     def crear_widgets(self):
@@ -40,7 +40,11 @@ class AlquilarFrame(BaseFrame):
 
     def confirmar_alquiler(self):
         espacio_id = self.espacio_var.get().strip().upper()
-        duracion = self.duracion_var.get()
+        try:
+            duracion = int(self.duracion_var.get())
+        except ValueError:
+            return messagebox.showerror("Error", "La duración debe ser un número entero.")
+            
         placa = self.placa_var.get()
 
         if not espacio_id:

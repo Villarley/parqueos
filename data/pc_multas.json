@@ -1,1 +1,23 @@
-[]
+[
+    {
+        "correo": "santivillarley1010@gmail.com",
+        "espacio": "6",
+        "fecha": "01/06/2025 15:35",
+        "placa": "GT3RSS",
+        "detalle": "Tiempo de parqueo excedido sin desaparcar"
+    },
+    {
+        "correo": "santivillarley1010@gmail.com",
+        "espacio": "7",
+        "fecha": "01/06/2025 15:40",
+        "placa": "GT3RSS",
+        "detalle": "Tiempo de parqueo excedido sin desaparcar"
+    },
+    {
+        "fecha": "01/06/2025 15:41",
+        "espacio": "7",
+        "placa": "GT3RSS",
+        "detalle": "No hay alquiler registrado en este espacio.",
+        "correo": "santivillarley1010@gmail.com"
+    }
+]

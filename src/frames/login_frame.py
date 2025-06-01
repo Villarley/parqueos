@@ -29,8 +29,9 @@ class LoginFrame(BaseFrame):
         identificacion = self.entry_identificacion.get()
         contrasena = self.entry_contrasena.get()
 
-        usuario = mu.autenticar_usuario(identificacion, contrasena)
-        if usuario:
+        resultado = mu.autenticar_usuario(identificacion, contrasena)
+        if resultado["success"]:
+            usuario = resultado["usuario"]
             if usuario.get("temporal"):  # Tiene contraseña temporal
                 messagebox.showinfo("Contraseña temporal", "Debes cambiar tu contraseña ahora.")
                 from frames.auth.cambiar_contrasenia_frame import CambiarContrasenaFrame
@@ -41,8 +42,7 @@ class LoginFrame(BaseFrame):
             from frames.menu_usuario_frame import MenuUsuarioFrame
             self.master.cambiar_frame(MenuUsuarioFrame, usuario)
         else:
-            messagebox.showerror("Error", "Credenciales incorrectas")
-
+            messagebox.showerror("Error", resultado["mensaje"])
 
     def recuperar(self):
         correo = simpledialog.askstring("Recuperar contraseña", "Ingresa tu correo registrado")

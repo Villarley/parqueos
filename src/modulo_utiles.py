@@ -193,13 +193,11 @@ def actualizar_estados_de_parqueo():
 
     cambios = False
 
-    for esp in espacios:
-        espacio_id = esp["id"]
-
+    for espacio_id, espacio in espacios.items():
         # Buscar alquiler ACTIVO más reciente para este espacio
         alquiler = next(
             (a for a in sorted(alquileres, key=lambda x: x["fin"], reverse=True)
-             if a["espacio_id"] == espacio_id and a["estado"] == "activo"),
+             if a["espacio_id"] == int(espacio_id) and a["estado"] == "activo"),
             None
         )
 
@@ -209,9 +207,38 @@ def actualizar_estados_de_parqueo():
                 # Cambiar estado del alquiler
                 alquiler["estado"] = "finalizado"
                 # Liberar el espacio
-                esp["estado"] = "libre"
+                espacio["usuario"] = ""
+                espacio["placa"] = ""
+                espacio["inicio"] = ""
+                espacio["tiempo"] = 0
+                espacio["fin"] = ""
                 cambios = True
 
     if cambios:
         escribir_json(ESPACIOS_PATH, espacios)
         escribir_json(ALQUILERES_PATH, alquileres)
+
+def convertir_espacios_a_dict():
+    """Convierte el formato de espacios de lista a diccionario"""
+    espacios = leer_json("data/pc_espacios.json")
+    if isinstance(espacios, list):
+        nuevo_formato = {}
+        for espacio in espacios:
+            nuevo_formato[espacio["id"]] = {
+                "habilitado": "S",
+                "usuario": "",
+                "placa": "",
+                "inicio": "",
+                "tiempo": 0,
+                "fin": ""
+            }
+            # Si el espacio estaba ocupado, mantener esa información
+            if espacio.get("estado") == "ocupado":
+                nuevo_formato[espacio["id"]]["usuario"] = espacio.get("usuario", "")
+                nuevo_formato[espacio["id"]]["placa"] = espacio.get("placa", "")
+                nuevo_formato[espacio["id"]]["inicio"] = espacio.get("inicio", "")
+                nuevo_formato[espacio["id"]]["tiempo"] = espacio.get("tiempo", 0)
+                nuevo_formato[espacio["id"]]["fin"] = espacio.get("fin", "")
+        escribir_json("data/pc_espacios.json", nuevo_formato)
+        return nuevo_formato
+    return espacios

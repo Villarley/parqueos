@@ -7,6 +7,11 @@ class PerfilUsuarioFrame(BaseFrame):
     def __init__(self, master, usuario):
         super().__init__(master, usuario)
         self.entries = {}
+        if not usuario:
+            messagebox.showerror("Error", "No hay usuario logueado")
+            from frames.login_frame import LoginFrame
+            self.master.cambiar_frame(LoginFrame)
+            return
         self.crear_widgets()
 
     def crear_widgets(self):

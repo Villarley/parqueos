@@ -1,66 +1,42 @@
 [
     {
-        "id": "016ca68c-1e14-4888-81e1-c2fa550a60b5",
-        "espacio_id": "ESP001",
+        "id": "dcb3d224-e801-47f2-9de7-5be406f3e137",
+        "espacio_id": "6",
         "usuario": "santivillarley1010@gmail.com",
-        "inicio": "29/05/2025 23:45",
-        "fin": "30/05/2025 01:24",
+        "inicio": "01/06/2025 13:37",
+        "fin": "01/06/2025 14:07",
         "estado": "finalizado",
-        "costo_total": 247.5
+        "costo_total": 80.0,
+        "placa": "GT3RSS"
     },
     {
-        "id": "35a5c2b6-b61b-4ca3-85c7-f922f833d855",
-        "espacio_id": "ESP003",
+        "id": "4267503b-2a04-4498-ab56-4ccfe32eccbf",
+        "espacio_id": "6",
         "usuario": "santivillarley1010@gmail.com",
-        "inicio": "30/05/2025 09:56",
-        "fin": "30/05/2025 10:26",
-        "estado": "finalizado",
-        "costo_total": 75.0
-    },
-    {
-        "id": "447116e3-ca18-45fa-bfb6-7b6a6fed496f",
-        "espacio_id": "ESP001",
-        "usuario": "santivillarley1010@gmail.com",
-        "inicio": "30/05/2025 19:51",
-        "fin": "30/05/2025 20:21",
-        "estado": "finalizado",
-        "costo_total": 75.0
-    },
-    {
-        "id": "afcb66b1-0f9b-4e30-8b86-d7a4a11a87fd",
-        "espacio_id": "ESP003",
-        "usuario": "santivillarley1010@gmail.com",
-        "inicio": "30/05/2025 19:57",
-        "fin": "30/05/2025 21:07",
-        "estado": "finalizado",
-        "costo_total": 175.0
-    },
-    {
-        "id": "e6d17b23-bf17-411e-8cc4-4abd641926f6",
-        "espacio_id": "ESP001",
-        "usuario": "santivillarley1010@gmail.com",
-        "inicio": "30/05/2025 20:02",
-        "fin": "30/05/2025 20:32",
-        "estado": "finalizado",
-        "costo_total": 75.0
-    },
-    {
-        "id": "9867b81f-9b6e-4362-a39f-5bd863398c27",
-        "espacio_id": "ESP003",
-        "usuario": "santivillarley1010@gmail.com",
-        "inicio": "30/05/2025 21:45",
-        "fin": "30/05/2025 22:45",
-        "estado": "finalizado",
-        "costo_total": 150.0
-    },
-    {
-        "id": "14f8f7e3-b284-445c-aa2b-83fadbca5451",
-        "espacio_id": "ESP001",
-        "usuario": "santivillarley1010@gmail.com",
-        "inicio": "30/05/2025 22:54",
-        "fin": "30/05/2025 23:55",
+        "inicio": "01/06/2025 15:35",
+        "fin": "01/06/2025 16:05",
         "estado": "activo",
-        "costo_total": 152.5,
+        "costo_total": 80.0,
+        "placa": "GT3RSS"
+    },
+    {
+        "id": "3bbf64e5-0bef-4806-9930-e5f7c1d46797",
+        "espacio_id": "7",
+        "usuario": "santivillarley1010@gmail.com",
+        "inicio": "01/06/2025 15:37",
+        "fin": "01/06/2025 15:39",
+        "estado": "finalizado",
+        "costo_total": 4.67,
+        "placa": "GT3RSS"
+    },
+    {
+        "id": "f816afd1-9003-42f2-ba31-d24b85dbd53e",
+        "espacio_id": "3",
+        "usuario": "santivillarley1010@gmail.com",
+        "inicio": "01/06/2025 15:40",
+        "fin": "01/06/2025 15:44",
+        "estado": "activo",
+        "costo_total": 9.33,
         "placa": "GT3RSS"
     }
 ]

@@ -44,14 +44,56 @@ def validar_contrasena(contrasena: str) -> bool:
 # ---------------------------
 # Autenticación
 # ---------------------------
-def autenticar_usuario(identificacion, contrasena: str) -> dict | None:
-    usuarios = mu.leer_json(USUARIOS_PATH)
-    usuario = next((u for u in usuarios if u["identificacion"] == identificacion), None)
-
-    if usuario and bcrypt.checkpw(contrasena.encode('utf-8'), usuario["contrasena"].encode('utf-8')):
-        return usuario
-    return None
-
+def autenticar_usuario(identificacion, contrasena: str) -> dict:
+    """
+    Autentica un usuario con su identificación y contraseña.
+    
+    Args:
+        identificacion (str): Identificación del usuario
+        contrasena (str): Contraseña del usuario
+        
+    Returns:
+        dict: Diccionario con el estado de la autenticación:
+            - success (bool): True si la autenticación fue exitosa
+            - usuario (dict): Datos del usuario si la autenticación fue exitosa
+            - mensaje (str): Mensaje descriptivo del resultado
+    """
+    try:
+        usuarios = mu.leer_json(USUARIOS_PATH)
+        if not usuarios:  # Si la lista está vacía
+            return {
+                "success": False,
+                "usuario": None,
+                "mensaje": "No hay usuarios registrados en el sistema"
+            }
+            
+        usuario = next((u for u in usuarios if u["identificacion"] == identificacion), None)
+        
+        if not usuario:
+            return {
+                "success": False,
+                "usuario": None,
+                "mensaje": "Usuario no encontrado"
+            }
+            
+        if bcrypt.checkpw(contrasena.encode('utf-8'), usuario["contrasena"].encode('utf-8')):
+            return {
+                "success": True,
+                "usuario": usuario,
+                "mensaje": "Autenticación exitosa"
+            }
+        else:
+            return {
+                "success": False,
+                "usuario": None,
+                "mensaje": "Contraseña incorrecta"
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "usuario": None,
+            "mensaje": f"Error durante la autenticación: {str(e)}"
+        }
 
 # ---------------------------
 # Actualizar usuario
@@ -113,6 +155,7 @@ Contacta al administrador para reiniciarla."""
         mu.enviar_correo(correo, "Recuperación de contraseña", mensaje)
         return True
     return False
+
 # ---------------------------
 # Cambiar contraseña
 # ---------------------------

@@ -11,14 +11,25 @@ class AppAdmin(tk.Tk):
         self.resizable(True, True)
 
         self.current_frame = None
+        self.frame_history = []  # Para mantener un historial de frames
         self.cambiar_frame(MenuFrame)
 
     def cambiar_frame(self, frame_class, *args):
         if self.current_frame:
+            self.frame_history.append((self.current_frame.__class__, args))
             self.current_frame.destroy()
 
         self.current_frame = frame_class(self, *args)
         self.current_frame.pack(fill="both", expand=True)
+
+    def volver(self):
+        """Vuelve al frame anterior en el historial."""
+        if self.frame_history:
+            frame_class, args = self.frame_history.pop()
+            self.cambiar_frame(frame_class, *args)
+        else:
+            # Si no hay historial, volver al menú principal
+            self.cambiar_frame(MenuFrame)
 
 if __name__ == "__main__":
     app = AppAdmin()

@@ -30,7 +30,9 @@ class ReportesFrame(BaseFrame):
 
     def mostrar_disponibles(self):
         espacios = mu.leer_json("data/pc_espacios.json")
-        libres = [f"{e['id']}: {e['ubicacion']}" for e in espacios if e["estado"] == "libre"]
+        libres = [f"{int(id_espacio)}: {datos.get('ubicacion', 'Sin ubicación')}" 
+                 for id_espacio, datos in espacios.items() 
+                 if datos["habilitado"] == "S" and datos["usuario"] == ""]
         contenido = "Espacios disponibles:\n\n" + "\n".join(libres) if libres else "No hay espacios disponibles."
 
         self.actualizar_reporte(contenido)

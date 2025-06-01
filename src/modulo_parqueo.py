@@ -13,18 +13,23 @@ CONFIG_PATH = "data/pc_configuracion.json"
 # ----------------------------
 def obtener_espacios_disponibles() -> list:
     espacios = mu.leer_json(ESPACIOS_PATH)
-    return [e for e in espacios if e["estado"] == "libre"]
+    return [int(id_espacio) for id_espacio, datos in espacios.items() 
+            if datos["habilitado"] == "S" and datos["usuario"] == ""]
 
 # ----------------------------
 # Alquilar espacio
 # ----------------------------
-def alquilar_espacio(correo_usuario: str, id_espacio: str, minutos: int, placa: str) -> bool:
+def alquilar_espacio(correo_usuario: str, id_espacio: int, minutos: int, placa: str) -> bool:
     espacios = mu.leer_json(ESPACIOS_PATH)
     alquileres = mu.leer_json(ALQUILERES_PATH)
     config = mu.leer_json(CONFIG_PATH)
 
-    espacio = next((e for e in espacios if e["id"] == id_espacio), None)
-    if not espacio:
+    id_espacio_str = str(id_espacio)
+    if id_espacio_str not in espacios:
+        return False
+
+    espacio = espacios[id_espacio_str]
+    if espacio["habilitado"] != "S" or espacio["usuario"] != "":
         return False
 
     if minutos < config["tiempo_minimo"]:
@@ -46,7 +51,13 @@ def alquilar_espacio(correo_usuario: str, id_espacio: str, minutos: int, placa: 
     }
 
     alquileres.append(nuevo)
-    espacio["estado"] = "ocupado"
+    
+    # Actualizar espacio
+    espacio["usuario"] = correo_usuario
+    espacio["placa"] = placa
+    espacio["inicio"] = inicio.strftime("%d/%m/%Y %H:%M")
+    espacio["tiempo"] = minutos
+    espacio["fin"] = fin.strftime("%d/%m/%Y %H:%M")
 
     mu.escribir_json(ALQUILERES_PATH, alquileres)
     mu.escribir_json(ESPACIOS_PATH, espacios)
@@ -65,12 +76,12 @@ def alquilar_espacio(correo_usuario: str, id_espacio: str, minutos: int, placa: 
 
     return True
 
-
 # ----------------------------
 # Agregar tiempo
 # ----------------------------
 def agregar_tiempo_alquiler(id_alquiler: str, minutos_extra: int) -> bool:
     alquileres = mu.leer_json(ALQUILERES_PATH)
+    espacios = mu.leer_json(ESPACIOS_PATH)
     config = mu.leer_json(CONFIG_PATH)
 
     alquiler = next((a for a in alquileres if a["id"] == id_alquiler and a["estado"] == "activo"), None)
@@ -83,7 +94,13 @@ def agregar_tiempo_alquiler(id_alquiler: str, minutos_extra: int) -> bool:
     alquiler["fin"] = nuevo_fin.strftime("%d/%m/%Y %H:%M")
     alquiler["costo_total"] += round((minutos_extra / 60) * config["tarifa"], 2)
 
+    # Actualizar espacio
+    espacio = espacios[str(alquiler["espacio_id"])]
+    espacio["tiempo"] += minutos_extra
+    espacio["fin"] = nuevo_fin.strftime("%d/%m/%Y %H:%M")
+
     mu.escribir_json(ALQUILERES_PATH, alquileres)
+    mu.escribir_json(ESPACIOS_PATH, espacios)
 
     # Enviar correo confirmando la extensión
     mu.enviar_correo(
@@ -98,7 +115,6 @@ def agregar_tiempo_alquiler(id_alquiler: str, minutos_extra: int) -> bool:
 
     return True
 
-
 # ----------------------------
 # Desaparcar (liberar)
 # ----------------------------
@@ -110,23 +126,32 @@ def liberar_espacio(id_alquiler: str) -> bool:
     if not alquiler:
         return False
 
-    espacio = next((e for e in espacios if e["id"] == alquiler["espacio_id"]), None)
-    if not espacio:
+    espacio_id = str(alquiler["espacio_id"])
+    if espacio_id not in espacios:
         return False
 
     alquiler["estado"] = "finalizado"
-    espacio["estado"] = "libre"
+    
+    # Liberar espacio
+    espacio = espacios[espacio_id]
+    espacio["usuario"] = ""
+    espacio["placa"] = ""
+    espacio["inicio"] = ""
+    espacio["tiempo"] = 0
+    espacio["fin"] = ""
 
     mu.escribir_json(ALQUILERES_PATH, alquileres)
     mu.escribir_json(ESPACIOS_PATH, espacios)
     return True
+
 # ----------------------------
 # Obtener alquiler activo por usuario
 # ----------------------------
 def obtener_alquiler_activo(correo_usuario: str) -> dict | None:
     alquileres = mu.leer_json(ALQUILERES_PATH)
     return next((a for a in alquileres if a["usuario"] == correo_usuario and a["estado"] == "activo"), None)
-def verificar_estado_espacio(id_espacio: str) -> str:
+
+def verificar_estado_espacio(id_espacio: int) -> str:
     """
     Devuelve el estado actual del espacio:
     - 'libre'
@@ -134,10 +159,15 @@ def verificar_estado_espacio(id_espacio: str) -> str:
     - 'no_existe'
     """
     espacios = mu.leer_json(ESPACIOS_PATH)
-    espacio = next((e for e in espacios if e["id"] == id_espacio), None)
-    if not espacio:
+    id_espacio_str = str(id_espacio)
+    if id_espacio_str not in espacios:
         return "no_existe"
-    return espacio["estado"]
+    
+    espacio = espacios[id_espacio_str]
+    if espacio["habilitado"] != "S":
+        return "no_existe"
+    return "ocupado" if espacio["usuario"] else "libre"
+
 # ----------------------------
 # Verificar multas por tiempo excedido
 # ----------------------------
@@ -155,15 +185,20 @@ def verificar_multas():
             if ahora > fin:
                 alquiler["estado"] = "finalizado"
 
-                espacio = next((e for e in espacios if e["id"] == alquiler["espacio_id"]), None)
-                if espacio:
-                    espacio["estado"] = "libre"
+                espacio_id = str(alquiler["espacio_id"])
+                if espacio_id in espacios:
+                    espacio = espacios[espacio_id]
+                    espacio["usuario"] = ""
+                    espacio["placa"] = ""
+                    espacio["inicio"] = ""
+                    espacio["tiempo"] = 0
+                    espacio["fin"] = ""
 
                 multa = {
                     "correo": alquiler["usuario"],
                     "espacio": alquiler["espacio_id"],
                     "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
-                    "placa": alquiler.get("placa", "N/D"),  # Si decides registrar placas
+                    "placa": alquiler.get("placa", "N/D"),
                     "detalle": "Tiempo de parqueo excedido sin desaparcar"
                 }
                 multas.append(multa)
