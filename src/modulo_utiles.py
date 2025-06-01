@@ -1,5 +1,19 @@
 # src/modulo_utiles.py
 
+"""
+Módulo de utilidades para el sistema de parqueos.
+
+Este módulo proporciona funciones de utilidad para:
+- Manejo de archivos JSON
+- Validaciones de datos
+- Gestión de fechas y horas
+- Envío de correos electrónicos
+- Actualización automática de estados de parqueo
+
+El módulo utiliza SMTP para el envío de correos y maneja archivos JSON
+para el almacenamiento de datos del sistema.
+"""
+
 import json
 import re
 import smtplib
@@ -9,9 +23,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import os
 
-# ---------------------
-# Manejo de Archivos JSON
-# ---------------------
+# Rutas de los archivos de datos
+ESPACIOS_PATH = "data/pc_espacios.json"
+ALQUILERES_PATH = "data/pc_alquileres.json"
 
 def leer_json(path: str) -> dict | list:
     """
@@ -22,6 +36,11 @@ def leer_json(path: str) -> dict | list:
 
     Returns:
         dict | list: Contenido del JSON. Retorna {} o [] si hay error.
+        
+    Notas:
+        - Si el archivo no existe, retorna un diccionario vacío para archivos .json
+        - Si el archivo no existe, retorna una lista vacía para otros casos
+        - Maneja errores de decodificación JSON
     """
     try:
         with open(path, 'r', encoding='utf-8') as file:
@@ -36,13 +55,14 @@ def escribir_json(path: str, data: dict | list) -> None:
     Args:
         path (str): Ruta del archivo JSON.
         data (dict | list): Datos a escribir.
+        
+    Notas:
+        - Los datos se escriben con indentación para mejor legibilidad
+        - Se usa codificación UTF-8 para soportar caracteres especiales
+        - Se desactiva ensure_ascii para permitir caracteres no ASCII
     """
     with open(path, 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=4, ensure_ascii=False)
-
-# ---------------------
-# Validaciones
-# ---------------------
 
 def validar_correo(correo: str) -> bool:
     """
@@ -53,22 +73,29 @@ def validar_correo(correo: str) -> bool:
 
     Returns:
         bool: True si es válido, False en caso contrario.
+        
+    Validaciones:
+        - Debe contener un @
+        - Debe tener un dominio válido
+        - Puede contener puntos, guiones y guiones bajos
     """
     patron = r'^[\w\.-]+@[\w\.-]+\.\w+$'
     return re.match(patron, correo) is not None
 
 def validar_contrasena(contrasena: str) -> bool:
     """
-    Valida si la contraseña es segura:
-    - Al menos 8 caracteres
-    - Contiene una mayúscula
-    - Contiene un número
+    Valida si la contraseña cumple con los requisitos de seguridad.
 
     Args:
         contrasena (str): Contraseña a validar.
 
     Returns:
         bool: True si cumple con los criterios, False si no.
+        
+    Requisitos:
+        - Al menos 8 caracteres
+        - Contiene al menos una letra mayúscula
+        - Contiene al menos un número
     """
     return (
         len(contrasena) >= 8 and
@@ -78,33 +105,29 @@ def validar_contrasena(contrasena: str) -> bool:
 
 def validar_telefono(tel: str) -> bool:
     """
-    Valida si el teléfono contiene exactamente 10 dígitos.
+    Valida si el teléfono tiene formato válido.
 
     Args:
         tel (str): Teléfono a validar.
 
     Returns:
         bool: True si es válido, False en caso contrario.
+        
+    Validaciones:
+        - Debe contener exactamente 8 dígitos
+        - Solo se permiten números
     """
     return re.fullmatch(r'\d{8}', tel) is not None
 
-# ---------------------
-# Fecha y Hora Actual
-# ---------------------
-
 def fecha_hora_actual() -> str:
     """
-    Devuelve la fecha y hora actual con formato: DD/MM/YYYY HH:MM
+    Devuelve la fecha y hora actual en formato legible.
 
     Returns:
-        str: Fecha y hora como string.
+        str: Fecha y hora en formato "DD/MM/YYYY HH:MM"
     """
     ahora = datetime.now()
     return ahora.strftime('%d/%m/%Y %H:%M')
-
-# ---------------------
-# Envío de Correos
-# ---------------------
 
 def enviar_correo(destino: str, asunto: str, cuerpo: str, adjunto: str = None) -> bool:
     """
@@ -118,17 +141,25 @@ def enviar_correo(destino: str, asunto: str, cuerpo: str, adjunto: str = None) -
 
     Returns:
         bool: True si el correo se envió correctamente, False en caso contrario.
+        
+    Notas:
+        - Usa SMTP de Gmail con TLS
+        - Requiere credenciales de aplicación de Gmail
+        - Soporta archivos adjuntos opcionales
     """
     remitente = 'santivillarley1010@gmail.com'
     clave = 'vhev updw cwgj dvkv'  # Usa clave de aplicación para Gmail
 
+    # Configurar mensaje
     msg = MIMEMultipart()
     msg['From'] = remitente
     msg['To'] = destino
     msg['Subject'] = asunto
 
+    # Agregar cuerpo
     msg.attach(MIMEText(cuerpo, 'plain'))
 
+    # Agregar adjunto si existe
     if adjunto:
         with open(adjunto, "rb") as f:
             part = MIMEApplication(f.read(), Name=os.path.basename(adjunto))
@@ -136,6 +167,7 @@ def enviar_correo(destino: str, asunto: str, cuerpo: str, adjunto: str = None) -
             msg.attach(part)
 
     try:
+        # Enviar correo
         servidor = smtplib.SMTP('smtp.gmail.com', 587)
         servidor.starttls()
         servidor.login(remitente, clave)
@@ -145,28 +177,45 @@ def enviar_correo(destino: str, asunto: str, cuerpo: str, adjunto: str = None) -
     except Exception as e:
         print(f"Error al enviar correo: {e}")
         return False
-    
-# ---------------------
-# Envío de Correos (versión con adjunto binario y nombre)
-# ---------------------
 
 def enviar_correo_con_adjunto_binario(destino: str, asunto: str, cuerpo: str, adjunto: bytes, nombre_adjunto: str) -> bool:
+    """
+    Envía un correo electrónico con un adjunto binario.
+
+    Args:
+        destino (str): Dirección del destinatario.
+        asunto (str): Asunto del correo.
+        cuerpo (str): Contenido del mensaje.
+        adjunto (bytes): Contenido binario del adjunto.
+        nombre_adjunto (str): Nombre del archivo adjunto.
+
+    Returns:
+        bool: True si el correo se envió correctamente, False en caso contrario.
+        
+    Notas:
+        - Versión alternativa de enviar_correo para adjuntos binarios
+        - Útil para enviar PDFs generados en memoria
+    """
     remitente = 'santivillarley1010@gmail.com'
     clave = 'vhev updw cwgj dvkv'  # clave de aplicación
 
+    # Configurar mensaje
     msg = MIMEMultipart()
     msg['From'] = remitente
     msg['To'] = destino
     msg['Subject'] = asunto
 
+    # Agregar cuerpo
     msg.attach(MIMEText(cuerpo, 'plain'))
 
+    # Agregar adjunto binario
     if adjunto:
         parte_adjunto = MIMEApplication(adjunto, Name=nombre_adjunto)
         parte_adjunto['Content-Disposition'] = f'attachment; filename="{nombre_adjunto}"'
         msg.attach(parte_adjunto)
 
     try:
+        # Enviar correo
         servidor = smtplib.SMTP('smtp.gmail.com', 587)
         servidor.starttls()
         servidor.login(remitente, clave)
@@ -176,16 +225,21 @@ def enviar_correo_con_adjunto_binario(destino: str, asunto: str, cuerpo: str, ad
     except Exception as e:
         print(f"Error al enviar correo con adjunto binario: {e}")
         return False
-# ---------------------
-# Actualización automática de espacios vencidos
-# ---------------------
-
-ESPACIOS_PATH = "data/pc_espacios.json"
-ALQUILERES_PATH = "data/pc_alquileres.json"
 
 def actualizar_estados_de_parqueo():
     """
-    Libera automáticamente espacios vencidos y actualiza alquileres de 'activo' a 'finalizado'.
+    Libera automáticamente espacios vencidos y actualiza alquileres.
+    
+    Este método:
+    1. Revisa todos los espacios y sus alquileres activos
+    2. Identifica aquellos que han excedido su tiempo
+    3. Actualiza el estado de los alquileres a 'finalizado'
+    4. Libera los espacios correspondientes
+    
+    Notas:
+        - Se ejecuta periódicamente para mantener el sistema actualizado
+        - Solo afecta a alquileres en estado 'activo'
+        - Guarda los cambios en los archivos JSON correspondientes
     """
     espacios = leer_json(ESPACIOS_PATH)
     alquileres = leer_json(ALQUILERES_PATH)
@@ -219,7 +273,17 @@ def actualizar_estados_de_parqueo():
         escribir_json(ALQUILERES_PATH, alquileres)
 
 def convertir_espacios_a_dict():
-    """Convierte el formato de espacios de lista a diccionario"""
+    """
+    Convierte el formato de espacios de lista a diccionario.
+    
+    Returns:
+        dict: Espacios en formato diccionario
+        
+    Notas:
+        - Función de migración para actualizar el formato de datos
+        - Mantiene la información de espacios ocupados
+        - Establece valores por defecto para espacios nuevos
+    """
     espacios = leer_json("data/pc_espacios.json")
     if isinstance(espacios, list):
         nuevo_formato = {}

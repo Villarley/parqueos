@@ -1,3 +1,8 @@
+"""
+Módulo que implementa la interfaz gráfica para el proceso de alquiler de espacios de parqueo.
+Este módulo permite a los usuarios seleccionar un espacio, vehículo y duración para alquilar un parqueo.
+"""
+
 import tkinter as tk
 from tkinter import messagebox
 from frames.base_frame import BaseFrame
@@ -5,7 +10,30 @@ import modulo_parqueo as mp
 import modulo_usuarios as mu
 
 class AlquilarFrame(BaseFrame):
+    """
+    Frame para la interfaz de alquiler de espacios de parqueo.
+    
+    Esta clase maneja la interfaz gráfica que permite a los usuarios:
+    - Seleccionar un espacio de parqueo por su ID
+    - Elegir un vehículo de su lista de vehículos registrados
+    - Especificar la duración del alquiler
+    - Confirmar el alquiler del espacio
+    
+    Attributes:
+        usuario (dict): Diccionario con la información del usuario actual
+        placa_var (StringVar): Variable para almacenar la placa del vehículo seleccionado
+        espacio_var (StringVar): Variable para almacenar el ID del espacio seleccionado
+        duracion_var (StringVar): Variable para almacenar la duración del alquiler
+    """
+    
     def __init__(self, master, usuario):
+        """
+        Inicializa el frame de alquiler.
+        
+        Args:
+            master: Widget padre de este frame
+            usuario (dict): Información del usuario actual
+        """
         super().__init__(master, usuario)
         self.usuario = usuario
         self.placa_var = tk.StringVar()
@@ -14,6 +42,15 @@ class AlquilarFrame(BaseFrame):
         self.crear_widgets()
 
     def crear_widgets(self):
+        """
+        Crea y configura todos los widgets de la interfaz.
+        
+        Este método configura:
+        - Etiquetas y campos de entrada para el ID del espacio
+        - Menú desplegable para seleccionar el vehículo
+        - Campo para ingresar la duración del alquiler
+        - Botones de confirmación y retorno
+        """
         tk.Label(self, text="🅿️ Alquilar espacio", font=("Arial", 16)).pack(pady=10)
 
         # Entrada manual de ID
@@ -39,6 +76,21 @@ class AlquilarFrame(BaseFrame):
         self.crear_boton_volver()
 
     def confirmar_alquiler(self):
+        """
+        Procesa la solicitud de alquiler de un espacio.
+        
+        Este método:
+        1. Valida los datos ingresados (espacio, duración, placa)
+        2. Verifica el estado del espacio seleccionado
+        3. Intenta realizar el alquiler
+        4. Muestra mensajes de éxito o error según corresponda
+        
+        Validaciones realizadas:
+        - El ID del espacio no debe estar vacío
+        - La duración debe ser un número entero positivo
+        - La placa debe estar seleccionada
+        - El espacio debe existir en el sistema
+        """
         espacio_id = self.espacio_var.get().strip().upper()
         try:
             duracion = int(self.duracion_var.get())
@@ -47,6 +99,7 @@ class AlquilarFrame(BaseFrame):
             
         placa = self.placa_var.get()
 
+        # Validaciones de datos ingresados
         if not espacio_id:
             return messagebox.showerror("Error", "Debe ingresar un ID de espacio.")
         if duracion < 1:
@@ -54,7 +107,7 @@ class AlquilarFrame(BaseFrame):
         if not placa:
             return messagebox.showerror("Error", "Debe seleccionar una placa.")
 
-        # Validar espacio
+        # Validación del estado del espacio
         estado = mp.verificar_estado_espacio(espacio_id)
         if estado == "no_existe":
             return messagebox.showerror("Error", f"El espacio {espacio_id} no existe.")
@@ -66,6 +119,7 @@ class AlquilarFrame(BaseFrame):
             if not continuar:
                 return
 
+        # Intento de alquiler del espacio
         exito = mp.alquilar_espacio(
             correo_usuario=self.usuario["correo"],
             id_espacio=espacio_id,

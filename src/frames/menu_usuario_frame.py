@@ -1,5 +1,17 @@
 # src/frames/menu_usuario_frame.py
 
+"""
+Módulo para el menú principal de usuarios del sistema de parqueos.
+
+Este módulo implementa la interfaz del menú principal que permite a los usuarios:
+- Acceder a las diferentes funcionalidades del sistema
+- Ver información de su cuenta
+- Navegar a otras secciones de la aplicación
+
+La interfaz utiliza Tkinter y hereda de BaseFrame para mantener
+la consistencia con el resto de la aplicación.
+"""
+
 import tkinter as tk
 from tkinter import messagebox
 import os
@@ -15,8 +27,26 @@ from frames.acerca_de_frame import AcercaDeFrame
 from frames.user.perfil_usuario_frame import PerfilUsuarioFrame
 import modulo_utiles as mu
 import modulo_parqueo as mp
+
 class MenuUsuarioFrame(BaseFrame):
+    """
+    Frame para el menú principal de usuarios.
+    
+    Esta clase maneja la interfaz gráfica del menú principal que muestra
+    todas las opciones disponibles para los usuarios del sistema.
+    
+    Attributes:
+        usuario (dict): Información del usuario actual
+    """
+    
     def __init__(self, master, usuario):
+        """
+        Inicializa el frame del menú principal.
+        
+        Args:
+            master: Widget padre de este frame
+            usuario (dict): Información del usuario actual
+        """
         mp.verificar_multas()
         mu.actualizar_estados_de_parqueo()
         super().__init__(master, usuario)
@@ -33,27 +63,75 @@ class MenuUsuarioFrame(BaseFrame):
             messagebox.showerror("Error", f"No se pudo abrir el manual de ayuda.\n{e}")
 
     def crear_widgets(self):
-        nombre = self.usuario['nombre'] if self.usuario else "Usuario"
-        tk.Label(self, text=f"Bienvenido, {nombre}").pack(pady=10)
+        """
+        Crea y configura todos los widgets de la interfaz.
+        
+        Este método configura:
+        - Título y mensaje de bienvenida
+        - Botones para cada funcionalidad disponible
+        - Información del usuario actual
+        """
+        # Título y bienvenida
+        tk.Label(self, text="🏠 Menú Principal", font=("Arial", 16)).pack(pady=10)
+        tk.Label(self, text=f"Bienvenido, {self.usuario['nombre']}").pack()
 
-        tk.Button(self, text="🚗 Alquilar espacio", 
-                  command=lambda: self.master.cambiar_frame(AlquilarFrame, self.usuario)).pack(pady=5)
+        # Botones de funcionalidad
+        tk.Button(self, text="🅿️ Alquilar espacio", command=self.ir_a_alquilar).pack(pady=5)
+        tk.Button(self, text="🚗 Desaparcar", command=self.ir_a_desaparcar).pack(pady=5)
+        tk.Button(self, text="⏰ Agregar tiempo", command=self.ir_a_agregar_tiempo).pack(pady=5)
+        tk.Button(self, text="📝 Registrar vehículo", command=self.ir_a_registro_vehiculos).pack(pady=5)
+        tk.Button(self, text="📊 Reportes", command=self.ir_a_reportes).pack(pady=5)
+        tk.Button(self, text="⚙️ Configuración", command=self.ir_a_configuracion).pack(pady=5)
+        tk.Button(self, text="ℹ️ Acerca de", command=self.ir_a_acerca_de).pack(pady=5)
 
-        tk.Button(self, text="🅿️ Desaparcar", 
-                  command=lambda: self.master.cambiar_frame(DesaparcarFrame, self.usuario)).pack(pady=5)
+        # Botón de cerrar sesión
+        tk.Button(self, text="🚪 Cerrar sesión", command=self.cerrar_sesion).pack(pady=10)
 
-        tk.Button(self, text="⏱️ Agregar tiempo", 
-                  command=lambda: self.master.cambiar_frame(AgregarTiempoFrame, self.usuario)).pack(pady=5)
+    def ir_a_alquilar(self):
+        """
+        Navega a la pantalla de alquiler de espacios.
+        """
+        self.master.cambiar_frame(AlquilarFrame, self.usuario)
 
-        tk.Button(self, text="📊 Reportes", 
-                  command=lambda: self.master.cambiar_frame(ReportesFrame, self.usuario)).pack(pady=5)
+    def ir_a_desaparcar(self):
+        """
+        Navega a la pantalla de desaparcar vehículos.
+        """
+        self.master.cambiar_frame(DesaparcarFrame, self.usuario)
 
-        tk.Button(self, text="👤 Perfil", 
-                  command=lambda: self.master.cambiar_frame(PerfilUsuarioFrame, self.usuario)).pack(pady=5)
+    def ir_a_agregar_tiempo(self):
+        """
+        Navega a la pantalla de agregar tiempo a un alquiler.
+        """
+        self.master.cambiar_frame(AgregarTiempoFrame, self.usuario)
 
-        tk.Button(self, text="📘 Ayuda", command=self.abrir_ayuda).pack(pady=5)
+    def ir_a_registro_vehiculos(self):
+        """
+        Navega a la pantalla de registro de vehículos.
+        """
+        self.master.cambiar_frame(RegistroVehiculosFrame, self.usuario)
 
-        tk.Button(self, text="🧠 Acerca de", 
-                  command=lambda: self.master.cambiar_frame(AcercaDeFrame, self.usuario)).pack(pady=5)
+    def ir_a_reportes(self):
+        """
+        Navega a la pantalla de reportes.
+        """
+        self.master.cambiar_frame(ReportesFrame, self.usuario)
 
-        self.crear_boton_volver()
+    def ir_a_configuracion(self):
+        """
+        Navega a la pantalla de configuración.
+        """
+        self.master.cambiar_frame(ConfiguracionFrame, self.usuario)
+
+    def ir_a_acerca_de(self):
+        """
+        Navega a la pantalla de información del sistema.
+        """
+        self.master.cambiar_frame(AcercaDeFrame, self.usuario)
+
+    def cerrar_sesion(self):
+        """
+        Cierra la sesión actual y regresa a la pantalla de login.
+        """
+        from frames.login_frame import LoginFrame
+        self.master.cambiar_frame(LoginFrame)
