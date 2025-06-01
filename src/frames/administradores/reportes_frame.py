@@ -1,3 +1,16 @@
+"""
+Módulo para la generación y visualización de reportes administrativos.
+
+Este módulo implementa la interfaz que permite a los administradores:
+- Generar reportes de ingresos
+- Ver estadísticas de uso
+- Exportar reportes en diferentes formatos
+- Filtrar reportes por fecha y tipo
+
+La interfaz utiliza Tkinter y hereda de BaseFrame para mantener
+la consistencia con el resto de la aplicación.
+"""
+
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 from datetime import datetime
@@ -8,13 +21,44 @@ MULTAS_PATH = "data/pc_multas.json"
 ESPACIOS_PATH = "data/pc_espacios.json"
 
 class ReportesAdminFrame(tk.Frame):
+    """
+    Frame para la gestión de reportes administrativos.
+    
+    Esta clase maneja la interfaz gráfica que permite a los administradores
+    generar y visualizar diferentes tipos de reportes del sistema.
+    
+    Attributes:
+        fecha_inicio_var (StringVar): Variable para la fecha de inicio
+        fecha_fin_var (StringVar): Variable para la fecha de fin
+        tipo_reporte_var (StringVar): Variable para el tipo de reporte
+    """
+    
     def __init__(self, master):
+        """
+        Inicializa el frame de reportes.
+        
+        Args:
+            master: Widget padre de este frame
+        """
         super().__init__(master)
         self.master = master
         self.reporte_actual = ""
+        self.fecha_inicio_var = tk.StringVar()
+        self.fecha_fin_var = tk.StringVar()
+        self.tipo_reporte_var = tk.StringVar()
         self.crear_widgets()
 
     def crear_widgets(self):
+        """
+        Crea y configura todos los widgets de la interfaz.
+        
+        Este método configura:
+        - Título y secciones principales
+        - Campos para seleccionar fechas
+        - Selector de tipo de reporte
+        - Tabla para mostrar resultados
+        - Botones de generación y exportación
+        """
         tk.Label(self, text="📊 Reportes Administrativos", font=("Arial", 16)).pack(pady=10)
 
         tk.Button(self, text="💵 Ingresos por estacionamiento", command=self.reporte_ingresos).pack(pady=5)
@@ -25,18 +69,53 @@ class ReportesAdminFrame(tk.Frame):
         self.text = tk.Text(self, width=80, height=25)
         self.text.pack(pady=10)
 
+        # Frame para filtros
+        filtros_frame = tk.Frame(self)
+        filtros_frame.pack(pady=10)
+
+        # Fechas
+        tk.Label(filtros_frame, text="Fecha inicio:").grid(row=0, column=0, padx=5)
+        tk.Entry(filtros_frame, textvariable=self.fecha_inicio_var).grid(row=0, column=1, padx=5)
+
+        tk.Label(filtros_frame, text="Fecha fin:").grid(row=0, column=2, padx=5)
+        tk.Entry(filtros_frame, textvariable=self.fecha_fin_var).grid(row=0, column=3, padx=5)
+
+        # Tipo de reporte
+        tk.Label(filtros_frame, text="Tipo:").grid(row=1, column=0, padx=5, pady=5)
+        tipos = ["Ingresos", "Uso", "Multas", "Usuarios"]
+        tk.OptionMenu(filtros_frame, self.tipo_reporte_var, *tipos).grid(row=1, column=1, padx=5)
+
+        # Botones
+        tk.Button(filtros_frame, text="Generar", command=self.generar_reporte).grid(row=1, column=2, padx=5)
+        tk.Button(filtros_frame, text="Exportar", command=self.exportar_reporte).grid(row=1, column=3, padx=5)
+
+        # Tabla de resultados
+        self.tabla = tk.Treeview(self)
+        self.tabla.pack(pady=10, fill=tk.BOTH, expand=True)
+
         tk.Button(self, text="🔙 Volver", command=self.master.volver).pack(pady=10)
 
     # ------------ Reporte 1: Ingresos por fecha ------------
     def reporte_ingresos(self):
-        desde = simpledialog.askstring("Desde", "Fecha inicial (dd/mm/yyyy):")
-        hasta = simpledialog.askstring("Hasta", "Fecha final (dd/mm/yyyy):")
-        if not desde or not hasta:
-            return
+        """
+        Genera un reporte de ingresos por estacionamiento.
+        
+        Este método:
+        1. Solicita las fechas de inicio y fin
+        2. Valida las fechas ingresadas
+        3. Obtiene los alquileres del sistema
+        4. Calcula los ingresos por día y total
+        5. Muestra los resultados en la interfaz
+        """
+        fecha_inicio = self.fecha_inicio_var.get()
+        fecha_fin = self.fecha_fin_var.get()
+
+        if not all([fecha_inicio, fecha_fin]):
+            return messagebox.showerror("Error", "Complete todos los campos.")
 
         try:
-            desde_dt = datetime.strptime(desde, "%d/%m/%Y")
-            hasta_dt = datetime.strptime(hasta, "%d/%m/%Y")
+            desde_dt = datetime.strptime(fecha_inicio, "%d/%m/%Y")
+            hasta_dt = datetime.strptime(fecha_fin, "%d/%m/%Y")
         except ValueError:
             return messagebox.showerror("Error", "Formato incorrecto. Use dd/mm/yyyy")
 
@@ -60,6 +139,15 @@ class ReportesAdminFrame(tk.Frame):
 
     # ------------ Reporte 2: Lista de espacios ------------
     def lista_espacios(self):
+        """
+        Genera una lista de espacios de parqueo.
+        
+        Este método:
+        1. Solicita el tipo de lista a mostrar
+        2. Obtiene la lista de espacios del sistema
+        3. Filtra la lista según el tipo seleccionado
+        4. Muestra los resultados en la interfaz
+        """
         espacios = mu.leer_json(ESPACIOS_PATH)
         if not isinstance(espacios, dict):
             return messagebox.showerror("Error", "Error leyendo espacios.")
@@ -99,14 +187,25 @@ class ReportesAdminFrame(tk.Frame):
 
     # ------------ Reporte 3: Historial de usos ------------
     def historial_usos(self):
-        desde = simpledialog.askstring("Desde", "Fecha inicial (dd/mm/yyyy):")
-        hasta = simpledialog.askstring("Hasta", "Fecha final (dd/mm/yyyy):")
-        if not desde or not hasta:
-            return
+        """
+        Genera un historial de usos de espacios.
+        
+        Este método:
+        1. Solicita las fechas de inicio y fin
+        2. Valida las fechas ingresadas
+        3. Obtiene los alquileres del sistema
+        4. Filtra los alquileres según las fechas
+        5. Muestra los resultados en la interfaz
+        """
+        fecha_inicio = self.fecha_inicio_var.get()
+        fecha_fin = self.fecha_fin_var.get()
+
+        if not all([fecha_inicio, fecha_fin]):
+            return messagebox.showerror("Error", "Complete todos los campos.")
 
         try:
-            desde_dt = datetime.strptime(desde, "%d/%m/%Y")
-            hasta_dt = datetime.strptime(hasta, "%d/%m/%Y")
+            desde_dt = datetime.strptime(fecha_inicio, "%d/%m/%Y")
+            hasta_dt = datetime.strptime(fecha_fin, "%d/%m/%Y")
         except ValueError:
             return messagebox.showerror("Error", "Formato incorrecto.")
 
@@ -127,14 +226,25 @@ class ReportesAdminFrame(tk.Frame):
 
     # ------------ Reporte 4: Historial de multas ------------
     def historial_multas(self):
-        desde = simpledialog.askstring("Desde", "Fecha inicial (dd/mm/yyyy):")
-        hasta = simpledialog.askstring("Hasta", "Fecha final (dd/mm/yyyy):")
-        if not desde or not hasta:
-            return
+        """
+        Genera un historial de multas.
+        
+        Este método:
+        1. Solicita las fechas de inicio y fin
+        2. Valida las fechas ingresadas
+        3. Obtiene las multas del sistema
+        4. Filtra las multas según las fechas
+        5. Muestra los resultados en la interfaz
+        """
+        fecha_inicio = self.fecha_inicio_var.get()
+        fecha_fin = self.fecha_fin_var.get()
+
+        if not all([fecha_inicio, fecha_fin]):
+            return messagebox.showerror("Error", "Complete todos los campos.")
 
         try:
-            desde_dt = datetime.strptime(desde, "%d/%m/%Y")
-            hasta_dt = datetime.strptime(hasta, "%d/%m/%Y")
+            desde_dt = datetime.strptime(fecha_inicio, "%d/%m/%Y")
+            hasta_dt = datetime.strptime(fecha_fin, "%d/%m/%Y")
         except ValueError:
             return messagebox.showerror("Error", "Formato incorrecto.")
 
@@ -155,6 +265,77 @@ class ReportesAdminFrame(tk.Frame):
             total += int(m.get("monto", 0))
         contenido += f"\nTOTAL ₡ en multas: {total}"
         self.actualizar_texto(contenido if filtro else "No hay multas en ese periodo.")
+
+    def generar_reporte(self):
+        """
+        Genera un reporte según los filtros seleccionados.
+        
+        Este método:
+        1. Valida las fechas ingresadas
+        2. Obtiene el tipo de reporte seleccionado
+        3. Genera el reporte correspondiente
+        4. Muestra los resultados en la tabla
+        """
+        fecha_inicio = self.fecha_inicio_var.get()
+        fecha_fin = self.fecha_fin_var.get()
+        tipo = self.tipo_reporte_var.get()
+
+        if not all([fecha_inicio, fecha_fin, tipo]):
+            return messagebox.showerror("Error", "Complete todos los campos.")
+
+        try:
+            reporte = mr.generar_reporte(tipo, fecha_inicio, fecha_fin)
+            self.mostrar_resultados(reporte)
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo generar el reporte: {e}")
+
+    def mostrar_resultados(self, datos):
+        """
+        Muestra los resultados del reporte en la tabla.
+        
+        Args:
+            datos (list): Lista de datos del reporte generado
+            
+        Este método:
+        1. Limpia la tabla actual
+        2. Configura las columnas según el tipo de reporte
+        3. Inserta los datos en la tabla
+        """
+        self.tabla.delete(*self.tabla.get_children())
+        
+        if not datos:
+            return
+
+        # Configurar columnas según el tipo de reporte
+        self.tabla["columns"] = list(datos[0].keys())
+        self.tabla["show"] = "headings"
+
+        for col in self.tabla["columns"]:
+            self.tabla.heading(col, text=col)
+            self.tabla.column(col, width=100)
+
+        # Insertar datos
+        for fila in datos:
+            self.tabla.insert("", tk.END, values=list(fila.values()))
+
+    def exportar_reporte(self):
+        """
+        Exporta el reporte actual a un archivo.
+        
+        Este método:
+        1. Verifica que haya datos para exportar
+        2. Solicita la ubicación del archivo
+        3. Exporta los datos en el formato seleccionado
+        4. Muestra mensajes de éxito o error
+        """
+        if not self.tabla.get_children():
+            return messagebox.showerror("Error", "No hay datos para exportar.")
+
+        try:
+            mr.exportar_reporte(self.tabla)
+            messagebox.showinfo("Éxito", "Reporte exportado correctamente.")
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo exportar el reporte: {e}")
 
     def actualizar_texto(self, texto):
         self.reporte_actual = texto
