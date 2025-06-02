@@ -25,6 +25,7 @@ from frames.agregar_tiempo_frame import AgregarTiempoFrame
 from frames.reportes_frame import ReportesFrame
 from frames.acerca_de_frame import AcercaDeFrame
 from frames.user.perfil_usuario_frame import PerfilUsuarioFrame
+from frames.registro_vehiculos_frame import RegistroVehiculosFrame
 import modulo_utiles as mu
 import modulo_parqueo as mp
 
@@ -79,9 +80,8 @@ class MenuUsuarioFrame(BaseFrame):
         tk.Button(self, text="🅿️ Alquilar espacio", command=self.ir_a_alquilar).pack(pady=5)
         tk.Button(self, text="🚗 Desaparcar", command=self.ir_a_desaparcar).pack(pady=5)
         tk.Button(self, text="⏰ Agregar tiempo", command=self.ir_a_agregar_tiempo).pack(pady=5)
-        tk.Button(self, text="📝 Registrar vehículo", command=self.ir_a_registro_vehiculos).pack(pady=5)
         tk.Button(self, text="📊 Reportes", command=self.ir_a_reportes).pack(pady=5)
-        tk.Button(self, text="⚙️ Configuración", command=self.ir_a_configuracion).pack(pady=5)
+        tk.Button(self, text="👤 Mi Perfil", command=self.ir_a_perfil).pack(pady=5)
         tk.Button(self, text="ℹ️ Acerca de", command=self.ir_a_acerca_de).pack(pady=5)
 
         # Botón de cerrar sesión
@@ -117,11 +117,11 @@ class MenuUsuarioFrame(BaseFrame):
         """
         self.master.cambiar_frame(ReportesFrame, self.usuario)
 
-    def ir_a_configuracion(self):
+    def ir_a_perfil(self):
         """
-        Navega a la pantalla de configuración.
+        Navega a la pantalla de perfil de usuario.
         """
-        self.master.cambiar_frame(ConfiguracionFrame, self.usuario)
+        self.master.cambiar_frame(PerfilUsuarioFrame, self.usuario)
 
     def ir_a_acerca_de(self):
         """
