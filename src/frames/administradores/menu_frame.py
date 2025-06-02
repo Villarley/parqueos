@@ -15,8 +15,8 @@ la consistencia con el resto de la aplicación.
 
 import tkinter as tk
 from frames.base_frame import BaseFrame
-from frames.administradores.espacio_frame import EspacioFrame
-from frames.administradores.reportes_frame import ReportesFrame
+from frames.administradores.espacio_frame import EspaciosFrame
+from frames.administradores.reportes_frame import ReportesAdminFrame
 from frames.administradores.configuracion_frame import ConfiguracionFrame
 
 class MenuAdminFrame(BaseFrame):
@@ -65,13 +65,13 @@ class MenuAdminFrame(BaseFrame):
         """
         Navega a la pantalla de gestión de espacios.
         """
-        self.master.cambiar_frame(EspacioFrame)
+        self.master.cambiar_frame(EspaciosFrame)
 
     def ir_a_reportes(self):
         """
         Navega a la pantalla de reportes.
         """
-        self.master.cambiar_frame(ReportesFrame)
+        self.master.cambiar_frame(ReportesAdminFrame)
 
     def ir_a_configuracion(self):
         """
