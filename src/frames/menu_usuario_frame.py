@@ -83,6 +83,7 @@ class MenuUsuarioFrame(BaseFrame):
         tk.Button(self, text="📊 Reportes", command=self.ir_a_reportes).pack(pady=5)
         tk.Button(self, text="👤 Mi Perfil", command=self.ir_a_perfil).pack(pady=5)
         tk.Button(self, text="ℹ️ Acerca de", command=self.ir_a_acerca_de).pack(pady=5)
+        tk.Button(self, text="📘 Ayuda", command=self.abrir_ayuda).pack(pady=5)
 
         # Botón de cerrar sesión
         tk.Button(self, text="🚪 Cerrar sesión", command=self.cerrar_sesion).pack(pady=10)

@@ -12,15 +12,16 @@ la consistencia con el resto de la aplicación.
 """
 
 import tkinter as tk
-from tkinter import messagebox, simpledialog
+from tkinter import ttk, messagebox, simpledialog
 from datetime import datetime
 import modulo_utiles as mu
+from frames.base_frame import BaseFrame
 
 ALQUILERES_PATH = "data/pc_alquileres.json"
 MULTAS_PATH = "data/pc_multas.json"
 ESPACIOS_PATH = "data/pc_espacios.json"
 
-class ReportesAdminFrame(tk.Frame):
+class ReportesAdminFrame(BaseFrame):
     """
     Frame para la gestión de reportes administrativos.
     
@@ -33,15 +34,16 @@ class ReportesAdminFrame(tk.Frame):
         tipo_reporte_var (StringVar): Variable para el tipo de reporte
     """
     
-    def __init__(self, master):
+    def __init__(self, master, app):
         """
         Inicializa el frame de reportes.
         
         Args:
             master: Widget padre de este frame
+            app: Instancia de la aplicación principal
         """
         super().__init__(master)
-        self.master = master
+        self.app = app
         self.reporte_actual = ""
         self.fecha_inicio_var = tk.StringVar()
         self.fecha_fin_var = tk.StringVar()
@@ -59,7 +61,23 @@ class ReportesAdminFrame(tk.Frame):
         - Tabla para mostrar resultados
         - Botones de generación y exportación
         """
-        tk.Label(self, text="📊 Reportes Administrativos", font=("Arial", 16)).pack(pady=10)
+        # Título y botón volver
+        header_frame = tk.Frame(self)
+        header_frame.pack(pady=10)
+
+        tk.Label(
+            header_frame,
+            text="📊 Reportes Administrativos",
+            font=("Arial", 16)
+        ).pack(side=tk.LEFT, padx=20)
+
+        tk.Button(
+            header_frame,
+            text="🔙 Volver",
+            command=self.app.volver,
+            font=("Arial", 12),
+            width=20
+        ).pack(side=tk.RIGHT, padx=20)
 
         tk.Button(self, text="💵 Ingresos por estacionamiento", command=self.reporte_ingresos).pack(pady=5)
         tk.Button(self, text="📋 Lista de espacios de parqueo", command=self.lista_espacios).pack(pady=5)
@@ -90,10 +108,8 @@ class ReportesAdminFrame(tk.Frame):
         tk.Button(filtros_frame, text="Exportar", command=self.exportar_reporte).grid(row=1, column=3, padx=5)
 
         # Tabla de resultados
-        self.tabla = tk.Treeview(self)
+        self.tabla = ttk.Treeview(self)
         self.tabla.pack(pady=10, fill=tk.BOTH, expand=True)
-
-        tk.Button(self, text="🔙 Volver", command=self.master.volver).pack(pady=10)
 
     # ------------ Reporte 1: Ingresos por fecha ------------
     def reporte_ingresos(self):
@@ -251,7 +267,7 @@ class ReportesAdminFrame(tk.Frame):
         multas = mu.leer_json(MULTAS_PATH)
         filtro = [
             m for m in multas
-            if desde_dt.date() <= datetime.strptime(m["fecha"], "%d/%m/%Y").date() <= hasta_dt.date()
+            if desde_dt.date() <= datetime.strptime(m["fecha"], "%d/%m/%Y %H:%M").date() <= hasta_dt.date()
         ]
 
         filtro.sort(key=lambda x: x["fecha"], reverse=True)

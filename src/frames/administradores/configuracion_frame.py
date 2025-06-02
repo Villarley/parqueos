@@ -1,14 +1,8 @@
 """
-Módulo para la configuración del sistema por administradores.
+Módulo para la configuración del sistema.
 
-Este módulo implementa la interfaz que permite a los administradores:
-- Configurar tarifas y precios
-- Establecer horarios de operación
-- Definir políticas de multas
-- Gestionar parámetros del sistema
-
-La interfaz utiliza Tkinter y hereda de BaseFrame para mantener
-la consistencia con el resto de la aplicación.
+Este módulo implementa la interfaz que permite a los administradores
+configurar los parámetros del sistema de parqueos.
 """
 
 import tkinter as tk
@@ -23,21 +17,23 @@ class ConfiguracionFrame(BaseFrame):
     Frame para la configuración del sistema.
     
     Esta clase maneja la interfaz gráfica que permite a los administradores
-    modificar los parámetros de configuración del sistema.
+    configurar los parámetros del sistema.
     
     Attributes:
         config (dict): Diccionario con la configuración actual
         entries (dict): Diccionario que mapea campos a sus widgets Entry
     """
     
-    def __init__(self, master):
+    def __init__(self, master, app):
         """
         Inicializa el frame de configuración.
         
         Args:
             master: Widget padre de este frame
+            app: Instancia de la aplicación principal
         """
         super().__init__(master)
+        self.app = app
         self.config = mu.leer_json(CONFIG_PATH)
         self.entries = {}
         self.crear_widgets()
@@ -71,7 +67,7 @@ class ConfiguracionFrame(BaseFrame):
 
         # Botones
         tk.Button(self, text="💾 Guardar cambios", command=self.guardar_config).pack(pady=10)
-        self.crear_boton_volver()
+        tk.Button(self, text="🔙 Volver", command=self.app.volver, font=("Arial", 12)).pack(pady=20)
 
     def guardar_config(self):
         """

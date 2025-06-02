@@ -1,23 +1,18 @@
 """
-Módulo para la gestión de espacios de parqueo por administradores.
+Módulo para la gestión de espacios de parqueo.
 
-Este módulo implementa la interfaz que permite a los administradores:
-- Ver el estado de los espacios de parqueo
-- Modificar el estado de los espacios
-- Agregar nuevos espacios
-- Eliminar espacios existentes
-
-La interfaz utiliza Tkinter y hereda de BaseFrame para mantener
-la consistencia con el resto de la aplicación.
+Este módulo implementa la interfaz que permite a los administradores
+gestionar los espacios de parqueo del sistema.
 """
 
 import tkinter as tk
 from tkinter import ttk, messagebox
 import modulo_utiles as mu
+from frames.base_frame import BaseFrame
 
 ESPACIOS_PATH = "data/pc_espacios.json"
 
-class EspaciosFrame(tk.Frame):
+class EspaciosFrame(BaseFrame):
     """
     Frame para la gestión de espacios de parqueo.
     
@@ -30,15 +25,16 @@ class EspaciosFrame(tk.Frame):
         habilitado_var (StringVar): Variable para el estado del espacio
     """
     
-    def __init__(self, master):
+    def __init__(self, master, app):
         """
         Inicializa el frame de gestión de espacios.
         
         Args:
             master: Widget padre de este frame
+            app: Instancia de la aplicación principal
         """
         super().__init__(master)
-        self.master = master
+        self.app = app
         self.espacios = self.cargar_espacios()
         self.espacio_var = tk.StringVar()
         self.habilitado_var = tk.StringVar(value="S")
@@ -67,7 +63,7 @@ class EspaciosFrame(tk.Frame):
         - Campos para agregar/modificar espacios
         - Botones de gestión
         """
-        tk.Label(self, text="🚧 Gestión de Espacios", font=("Arial", 16)).pack(pady=10)
+        tk.Label(self, text="🅿️ Gestión de Espacios", font=("Arial", 16, "bold")).pack(pady=20)
 
         self.tabla = ttk.Treeview(self, columns=("ID", "Habilitado", "Info"), show="headings")
         self.tabla.heading("ID", text="Número espacio")
@@ -89,7 +85,7 @@ class EspaciosFrame(tk.Frame):
 
         tk.Button(self, text="➕ Agregar/Actualizar", command=self.agregar_actualizar_espacio).pack(pady=5)
         tk.Button(self, text="💾 Guardar Cambios", command=self.guardar_cambios).pack(pady=5)
-        tk.Button(self, text="🔙 Volver", command=self.master.volver).pack(pady=5)
+        tk.Button(self, text="🔙 Volver", command=self.app.volver, font=("Arial", 12)).pack(pady=20)
 
     def actualizar_tabla(self):
         """
